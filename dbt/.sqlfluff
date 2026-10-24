@@ -1,0 +1,13 @@
+[sqlfluff]
+dialect = clickhouse
+templater = dbt
+max_line_length = 88
+rules = core, capitalisation.keywords, layout.long_lines
+exclude_rules = capitalisation.functions, capitalisation.types
+
+[sqlfluff:templater:dbt]
+project_dir = .
+profiles_dir = .
+
+[sqlfluff:rules:capitalisation.keywords]
+capitalisation_policy = lower

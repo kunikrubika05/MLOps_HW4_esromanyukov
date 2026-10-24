@@ -1,0 +1,23 @@
+name: mlops-hw4
+services:
+  clickhouse:
+    image: clickhouse/clickhouse-server:25.8@sha256:0152dd511befe6a2c2ef53e930726179669b08116da78500b37c51c96ff5ee77
+    environment:
+      CLICKHOUSE_USER: hw4
+      CLICKHOUSE_PASSWORD: local-demo-password
+      CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT: 1
+    ports:
+      - "127.0.0.1:18123:8123"
+    volumes:
+      - clickhouse-data:/var/lib/clickhouse
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+      - ./resources.xml:/etc/clickhouse-server/config.d/resources.xml:ro
+    mem_limit: 1536m
+    cpus: 2
+    healthcheck:
+      test: ["CMD", "clickhouse-client", "--user", "hw4", "--password", "local-demo-password", "--query", "select 1"]
+      interval: 3s
+      timeout: 5s
+      retries: 20
+volumes:
+  clickhouse-data:
