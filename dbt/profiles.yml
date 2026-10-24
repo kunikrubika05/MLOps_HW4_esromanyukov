@@ -1,0 +1,17 @@
+fraud_analytics:
+  target: dev
+  outputs:
+    dev:
+      type: clickhouse
+      host: localhost
+      port: 18123
+      user: hw4
+      password: local-demo-password
+      schema: analytics
+      threads: 1
+      custom_settings:
+        max_threads: 1
+        max_block_size: 16384
+        max_insert_block_size: 16384
+        min_insert_block_size_rows: 16384
+        min_insert_block_size_bytes: 1048576

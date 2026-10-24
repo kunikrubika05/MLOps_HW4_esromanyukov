@@ -1,0 +1,15 @@
+name: fraud_analytics
+version: '1.0'
+config-version: 2
+profile: fraud_analytics
+flags:
+  send_anonymous_usage_stats: false
+# Пороги рассчитаны по train.csv: суммы P75/P95, доля фрода клиентов P75, мерчантов P95
+vars:
+  medium_amount: 83
+  large_amount: 195.97
+  high_risk_rate: 1.1844331641285957
+  suspicious_rate: 1.7473118279569892
+models:
+  fraud_analytics:
+    +materialized: table

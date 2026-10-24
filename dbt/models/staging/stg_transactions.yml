@@ -1,0 +1,99 @@
+version: 2
+models:
+- name: stg_transactions
+  description: 'Нормализованные транзакции: строки, типы, ключи клиента и события, календарь
+    и сегмент суммы'
+  columns:
+  - name: transaction_key
+    description: Суррогатный ключ события по времени, мерчанту, категории, сумме, клиенту
+      и координатам
+    data_tests: [not_null, unique]
+  - name: customer_key
+    description: Приближённый ключ клиента по имени, фамилии и координатам; customer_id в
+      источнике отсутствует
+    data_tests: [not_null]
+  - name: transaction_time
+    description: Исходное время транзакции без пересчёта часового пояса
+  - name: transaction_date
+    description: Календарная дата транзакции
+  - name: weekday
+    description: 'День недели: понедельник — 1, воскресенье — 7'
+    data_tests:
+    - accepted_values:
+        arguments:
+          values: [1, 2, 3, 4, 5, 6, 7]
+          quote: false
+  - name: hour
+    description: Час транзакции от 0 до 23
+    data_tests:
+    - accepted_values:
+        arguments:
+          values: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
+            21, 22, 23]
+          quote: false
+  - name: merchant
+    description: Название мерчанта без пробелов по краям
+  - name: category
+    description: Категория покупки без пробелов по краям
+  - name: amount
+    description: Сумма с двумя знаками после запятой
+    data_tests:
+    - dbt_expectations.expect_column_values_to_be_between:
+        arguments:
+          min_value: 0
+  - name: amount_bucket
+    description: 'SMALL: ниже medium_amount, MEDIUM: от medium_amount до large_amount,
+      LARGE: от large_amount; верхняя граница MEDIUM не включается'
+    data_tests:
+    - accepted_values:
+        arguments:
+          values: [SMALL, MEDIUM, LARGE]
+          quote: true
+  - name: state
+    description: Код штата или DC в верхнем регистре
+  - name: target
+    description: 'Признак фрода: 0 или 1'
+    data_tests:
+    - accepted_values:
+        arguments:
+          values: [0, 1]
+          quote: false
+unit_tests:
+- name: staging_normalization_and_amount_boundaries
+  model: stg_transactions
+  given:
+  - input: source('raw', 'transactions')
+    format: sql
+    rows: |
+      select
+          toDateTime('2020-01-02 12:00:00') as transaction_time,
+          ' Shop ' as merch,
+          ' food ' as cat_id,
+          amount,
+          ' Ann ' as name_1,
+          ' Smith ' as name_2,
+          'dc' as us_state,
+          toFloat64(38.9) as lat,
+          toFloat64(-77) as lon,
+          toFloat64(38.8) as merchant_lat,
+          toFloat64(-77.1) as merchant_lon,
+          target
+      from values(
+          'amount Float64, target UInt8',
+          (82.99, 0), (83, 0), (195.96, 0), (195.97, 0),
+          (7.9399999999999995, 0), (250, 1)
+      )
+  expect:
+    rows:
+    - {amount: 82.99, amount_bucket: SMALL, merchant: Shop, category: food, state: DC, weekday: 4,
+      hour: 12, target: 0}
+    - {amount: 83, amount_bucket: MEDIUM, merchant: Shop, category: food, state: DC, weekday: 4,
+      hour: 12, target: 0}
+    - {amount: 195.96, amount_bucket: MEDIUM, merchant: Shop, category: food, state: DC, weekday: 4,
+      hour: 12, target: 0}
+    - {amount: 195.97, amount_bucket: LARGE, merchant: Shop, category: food, state: DC, weekday: 4,
+      hour: 12, target: 0}
+    - {amount: 7.94, amount_bucket: SMALL, merchant: Shop, category: food, state: DC, weekday: 4,
+      hour: 12, target: 0}
+    - {amount: 250, amount_bucket: LARGE, merchant: Shop, category: food, state: DC, weekday: 4,
+      hour: 12, target: 1}

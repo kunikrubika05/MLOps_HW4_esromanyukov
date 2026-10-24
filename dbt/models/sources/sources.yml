@@ -1,0 +1,35 @@
+version: 2
+sources:
+- name: raw
+  schema: transactions_db
+  description: Размеченный train.csv из исходного датасета HW2; отдельная таблица для HW4
+  tables:
+  - name: transactions
+    description: Сырые транзакции с известным признаком фрода
+    columns:
+    - name: transaction_time
+      description: Время транзакции без заданного в исходных данных часового пояса
+    - name: merch
+      description: Мерчант
+    - name: cat_id
+      description: Категория покупки
+    - name: amount
+      description: Сумма транзакции
+    - name: name_1
+      description: Имя клиента
+    - name: name_2
+      description: Фамилия клиента
+    - name: gender
+      description: 'Пол клиента: M или F'
+    - name: us_state
+      description: Код штата США или округа Колумбия
+    - name: lat
+      description: Широта клиента
+    - name: lon
+      description: Долгота клиента
+    - name: merchant_lat
+      description: Широта мерчанта
+    - name: merchant_lon
+      description: Долгота мерчанта
+    - name: target
+      description: 'Признак фрода: 1 — фрод, 0 — обычная транзакция'
