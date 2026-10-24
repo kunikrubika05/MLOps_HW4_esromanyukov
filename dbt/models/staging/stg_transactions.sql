@@ -17,11 +17,11 @@ with transactions as (
 
 select
     {{ dbt_utils.generate_surrogate_key([
-        'transaction_time', 'merchant', 'category', 'amount',
-        'first_name', 'last_name', 'lat', 'lon', 'merchant_lat', 'merchant_lon'
+        'transaction_time', 'hex(merchant)', 'hex(category)', 'amount',
+        'hex(first_name)', 'hex(last_name)', 'lat', 'lon', 'merchant_lat', 'merchant_lon'
     ]) }} as transaction_key,
     {{ dbt_utils.generate_surrogate_key([
-        'first_name', 'last_name', 'lat', 'lon'
+        'hex(first_name)', 'hex(last_name)', 'lat', 'lon'
     ]) }} as customer_key,
     transaction_time,
     toDate(transaction_time) as transaction_date,

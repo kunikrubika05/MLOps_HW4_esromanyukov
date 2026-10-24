@@ -61,6 +61,10 @@ models:
 unit_tests:
 - name: staging_normalization_and_amount_boundaries
   model: stg_transactions
+  overrides:
+    vars:
+      medium_amount: 83
+      large_amount: 195.97
   given:
   - input: source('raw', 'transactions')
     format: sql
