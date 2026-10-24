@@ -9,7 +9,7 @@ make setup up load deps build lint docs
 make serve
 ```
 
-[Документация](http://localhost:8082). Значок справа внизу открывает DAG. [Скриншот](results/dbt-dag.png) · [Результат тестов](results/dbt-test.log)
+[Локальная документация — после `make serve`](http://localhost:8082). Значок справа внизу открывает DAG. [Скриншот](results/dbt-dag.png) · [Результат тестов](results/dbt-test.log)
 
 Витрины — в базе `analytics`, модели и их описания — в `dbt/models/`. Доли считаются в процентах. Пороги рассчитаны по `train.csv`: суммы — P75/P95 (83/195,97), HIGH клиента — P75 долей фрода (≈1,1844%), подозрительный мерчант — P95 (≈1,7473%). MEDIUM клиента — ненулевая доля ниже HIGH, LOW — 0%. Точные границы — в `dbt/dbt_project.yml`
 
